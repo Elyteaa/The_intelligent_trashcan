@@ -21,7 +21,7 @@ void setup() {
   pinMode(echoPin2,INPUT);
   myservo.attach(3);
   //Serial.println("Start the prototype");
-  myservo.write(0); //so that it wouldn't move cause for some reason it does after launching Qt program
+  myservo.write(70); //so that it wouldn't move cause for some reason it does after launching Qt program
 }
 
 void loop() {
@@ -43,16 +43,21 @@ void loop() {
   duration2 = pulseIn(echoPin2, HIGH);
   distance2 = duration2 / 29 / 2;
 
-  if ((distance <= 10) && (distance2 <= 10)){
+    //Serial.println(distance);
+
+  if ((distance <= 10) && (distance2 <= 5)){
     light_alarm();
-    openlid();
+    openlid('o');
     light_alarm(); //light will light up twice - before opening and after it
   }
-  else if ((distance <= 10) && (distance2 > 10)){
-    openlid();
+  else if ((distance <= 10) && (distance2 > 5)){
+    openlid('o');
   }
-  else if ((distance > 10) && (distance2 <= 10)){
+  else if ((distance > 10) && (distance2 <= 5)){
     light_alarm();
+  }
+  else if(distance > 10){
+    openlid('c');
   }
   
   String command;
@@ -61,18 +66,23 @@ void loop() {
   }
 
   if(command == "pressed"){
-    openlid();
+    openlid('o');
+    delay(1000);
+    openlid('c');
   } else if (command == "lights") {light_alarm();}
   else if (command == "update") {updatingLCDs();};
 }
 
-void openlid(){
-  myservo.write(180);
-  delay(500);  //the lid will close after 2 seconds letting trash to fall
-  myservo.write(0);
-  delay(500);  //a break so that the person could move away
-  //Serial.print("Opened");
-  openedTimes += 1;
+void openlid(char lidState){
+  if(lidState == 'o'){
+    myservo.write(150);
+    delay(500);  //the lid will close after 2 seconds letting trash to fall
+    //Serial.print("Opened");
+    openedTimes += 1;
+  } else if(lidState == 'c'){    
+     myservo.write(70);
+     delay(500);  //a break so that the person could move away
+  }
 }
 
 void light_alarm() {
